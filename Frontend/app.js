@@ -1,16 +1,6 @@
-/* ═══════════════════════════════════════════
-   FASTAPI CONNECTION SETTINGS
-   Change API_BASE_URL to wherever your FastAPI
-   server is running (e.g. "http://127.0.0.1:8000"
-   in development, or your deployed API URL in
-   production). Leave it as an empty string "" if
-   this page is served from the same origin/domain
-   as the API.
-═══════════════════════════════════════════ */
+
 const API_BASE_URL = "https://airline-satisfaction-byfastapi-production.up.railway.app";
 
-// Maps the toggle-button values used in the UI to the exact category
-// labels the ML pipeline expects.
 const FIELD_MAP = {
   gender:      { male: "Male",            female: "Female" },
   customer:    { loyal: "Loyal Customer", disloyal: "disloyal customer" },
@@ -18,8 +8,6 @@ const FIELD_MAP = {
   flightClass: { eco: "Eco", "eco-plus": "Eco Plus", business: "Business" }
 };
 
-// Maps the rating widget ids used in the UI to the Passenger field names
-// expected by the FastAPI /predict endpoint.
 const RATING_FIELD_MAP = {
   wifi: "Inflight_wifi_service",
   depTime: "Departure_Arrival_time_convenient",
@@ -37,17 +25,11 @@ const RATING_FIELD_MAP = {
   cleanliness: "Cleanliness"
 };
 
-/* ═══════════════════════════════════════════
-   TOGGLE BUTTONS
-═══════════════════════════════════════════ */
 function pick(groupId, btn) {
   document.querySelectorAll(`#${groupId} .tog`).forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-/* ═══════════════════════════════════════════
-   SVG FACES
-═══════════════════════════════════════════ */
 const FACES = {
   satisfied: `
     <circle cx="40" cy="40" r="38" fill="none"/>
@@ -61,9 +43,6 @@ const FACES = {
     <path d="M24 58 Q40 44 56 58" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>`
 };
 
-/* ═══════════════════════════════════════════
-   STAR RATINGS
-═══════════════════════════════════════════ */
 document.querySelectorAll('.stars').forEach(wrap => {
   wrap.querySelectorAll('.s').forEach(star => {
     star.addEventListener('click', () => {
@@ -89,9 +68,6 @@ function hoverStars(wrap, v) {
   });
 }
 
-/* ═══════════════════════════════════════════
-   PREDICTION HISTORY
-═══════════════════════════════════════════ */
 let predHistory = [];
 
 function addHistory(entry) {
@@ -109,9 +85,6 @@ function addHistory(entry) {
   `).join('');
 }
 
-/* ═══════════════════════════════════════════
-   FORM SUBMIT
-═══════════════════════════════════════════ */
 document.getElementById('predictionForm').addEventListener('submit', e => {
   e.preventDefault();
   runPrediction();
@@ -122,9 +95,6 @@ function activeVal(groupId) {
   return btn ? btn.dataset.val : null;
 }
 
-/* ═══════════════════════════════════════════
-   BUILD REQUEST PAYLOAD FOR THE FASTAPI /predict ENDPOINT
-═══════════════════════════════════════════ */
 function buildPayload() {
   const gender       = activeVal('genderGroup');
   const customerType = activeVal('customerGroup');
@@ -157,9 +127,7 @@ function buildPayload() {
   };
 }
 
-/* ═══════════════════════════════════════════
-   CALL THE FASTAPI /predict ENDPOINT
-═══════════════════════════════════════════ */
+
 async function runPrediction() {
   const btn = document.getElementById('predictBtn');
   btn.classList.add('loading');
@@ -195,10 +163,8 @@ async function runPrediction() {
   }
 }
 
-/* Map the FastAPI /predict response { result, confidence }
-   into the { confidence, status, desc } shape the UI expects. */
 function mapApiResponse(data) {
-  // API returns "Satisfied" or "Neutral or Dissatisfied"
+ 
   const status = data.result === "Satisfied" ? 'satisfied' : 'unsatisfied';
 
   const confidence = (data.confidence !== null && data.confidence !== undefined)
