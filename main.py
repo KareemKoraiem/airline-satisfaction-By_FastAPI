@@ -1,5 +1,6 @@
 from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 
 
@@ -7,6 +8,17 @@ app = FastAPI(
     title="Airline Satisfaction Prediction API",
     description="Predict whether a passenger is satisfied or not.",
     version="1.0.0"
+)
+
+# Allow the frontend (served from a different origin/port, e.g. a static
+# file server or file:// during development) to call this API directly.
+# In production, replace "*" with the exact origin(s) of your frontend.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 from model_loader import (
@@ -85,9 +97,16 @@ def predict(passenger: Passenger):
 
         result = "Satisfied" if prediction == 1 else "Neutral or Dissatisfied"
 
+
+        confidence = None
+        if hasattr(model, "predict_proba"):
+            proba = model.predict_proba(df)[0]
+            confidence = round(float(max(proba)) * 100, 2)
+
+
         return {
-            "prediction": int(prediction),
-            "result": result
+            "result": result,
+            "confidence": confidence
         }
 
     except Exception as e:
