@@ -2,8 +2,8 @@
 const API_BASE_URL = "https://airline-satisfaction-byfastapi-production.up.railway.app";
 
 const FIELD_MAP = {
-  gender:      { male: "Male",            female: "Female" },
-  customer:    { loyal: "Loyal Customer", disloyal: "disloyal customer" },
+  gender:      { male: "Male",              female: "Female" },
+  customer:    { loyal: "Loyal Customer",   disloyal: "disloyal Customer" },
   travel:      { business: "Business travel", personal: "Personal Travel" },
   flightClass: { eco: "Eco", "eco-plus": "Eco Plus", business: "Business" }
 };
@@ -164,29 +164,52 @@ async function runPrediction() {
 }
 
 function mapApiResponse(data) {
- 
+
   const status = data.result === "Satisfied" ? 'satisfied' : 'unsatisfied';
 
-  const confidence = (data.confidence !== null && data.confidence !== undefined)
-    ? Math.round(data.confidence)
+  // API returns confidence already multiplied by 100 (e.g. 87.4)
+  const raw = data.confidence;
+  const confidence = (raw !== null && raw !== undefined && !isNaN(raw))
+    ? Math.round(raw)
     : null;
 
-  const desc = status === 'satisfied'
-    ? 'The passenger is likely to be satisfied with the flight experience.'
-    : 'The passenger is likely to be dissatisfied with the flight experience.';
+  const level = confidence === null ? ''
+    : confidence >= 80 ? 'high'
+    : confidence >= 55 ? 'medium'
+    : 'low';
 
-  return { confidence: confidence ?? '—', status, desc };
+  const desc = status === 'satisfied'
+    ? level === 'high'   ? 'The passenger is very likely to be satisfied with the flight experience.'
+    : level === 'medium' ? 'The passenger is likely to be satisfied with the flight experience.'
+    :                      'The passenger may be satisfied, but the model is not very confident.'
+    : level === 'high'   ? 'The passenger is very likely to be dissatisfied with the flight experience.'
+    : level === 'medium' ? 'The passenger is likely to be dissatisfied with the flight experience.'
+    :                      'The passenger may be dissatisfied, but the model is not very confident.';
+
+  return { confidence: confidence ?? null, status, desc };
 }
 
 /* ═══════════════════════════════════════════
    SHOW RESULT
 ═══════════════════════════════════════════ */
 function showResult({ confidence, status, desc }) {
-  const hasConfidence = typeof confidence === 'number';
-  const levelLabel = !hasConfidence ? ''
-                   : confidence >= 80 ? 'High Confidence'
-                   : confidence >= 55 ? 'Medium Confidence'
-                   :                    'Low Confidence';
+  const hasConfidence = typeof confidence === 'number' && !isNaN(confidence);
+
+  // Determine level label & color class based on confidence value
+  let levelLabel = '';
+  let levelClass = status; // default to status color
+  if (hasConfidence) {
+    if (confidence >= 80) {
+      levelLabel = 'High Confidence';
+      levelClass = 'high-conf';
+    } else if (confidence >= 55) {
+      levelLabel = 'Medium Confidence';
+      levelClass = 'medium-conf';
+    } else {
+      levelLabel = 'Low Confidence';
+      levelClass = 'low-conf';
+    }
+  }
 
   document.getElementById('rpEmpty').style.display = 'none';
   document.getElementById('rpErrorCard') && (document.getElementById('rpErrorCard').style.display = 'none');
@@ -202,7 +225,7 @@ function showResult({ confidence, status, desc }) {
   const barFill   = document.getElementById('rpBarFill');
   const confLevel = document.getElementById('rpConfLevel');
 
-  ['satisfied','neutral','unsatisfied'].forEach(c => {
+  ['satisfied','neutral','unsatisfied','high-conf','medium-conf','low-conf'].forEach(c => {
     wrap.classList.remove(c);
     inner.classList.remove(c);
     statusTxt.classList.remove(c);
@@ -214,7 +237,7 @@ function showResult({ confidence, status, desc }) {
   inner.classList.add(status);
   statusTxt.classList.add(status);
   barFill.classList.add(status);
-  confLevel.classList.add(status);
+  confLevel.classList.add(levelClass);
 
   // SVG face update
   if (faceSvg) faceSvg.innerHTML = FACES[status];
@@ -224,10 +247,14 @@ function showResult({ confidence, status, desc }) {
   pctEl.textContent     = hasConfidence ? `${confidence}%` : '—';
   confLevel.textContent = levelLabel;
 
+  // Reset bar to 0 first, then animate to target width
+  barFill.style.transition = 'none';
   barFill.style.width = '0%';
-  requestAnimationFrame(() => requestAnimationFrame(() => {
+
+  requestAnimationFrame(() => {
+    barFill.style.transition = 'width 0.9s cubic-bezier(0.4,0,0.2,1)';
     barFill.style.width = hasConfidence ? `${confidence}%` : '0%';
-  }));
+  });
 
   card.style.animation = 'none';
   void card.offsetHeight;

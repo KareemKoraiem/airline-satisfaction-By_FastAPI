@@ -2,6 +2,8 @@ from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 app = FastAPI(
@@ -54,6 +56,19 @@ def home():
         "message": "Airline Satisfaction API",
         "status": "Running"
     }
+
+@app.get("/feature-importance")
+def feature_importance():
+    """Returns the top feature importances from the trained model."""
+    if not hasattr(model, "feature_importances_"):
+        raise HTTPException(status_code=404, detail="Model does not support feature importances.")
+    fi = model.feature_importances_
+    pairs = sorted(
+        [{"feature": name, "importance": round(float(score), 4)} for name, score in zip(feature_names, fi)],
+        key=lambda x: x["importance"],
+        reverse=True
+    )
+    return {"feature_importances": pairs}
 
 @app.post("/predict")
 def predict(passenger: Passenger):

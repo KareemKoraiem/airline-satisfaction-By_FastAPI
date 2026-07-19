@@ -465,9 +465,12 @@ body::before {
 .rp-bar-fill.unsatisfied { background: linear-gradient(90deg, #ef4444, #b91c1c); }
 
 .rp-conf-level { font-size: 13px; font-weight: 700; transition: color 0.4s; }
-.rp-conf-level.satisfied   { color: #15803d; }
-.rp-conf-level.neutral     { color: #b45309; }
-.rp-conf-level.unsatisfied { color: #b91c1c; }
+.rp-conf-level.satisfied    { color: #15803d; }
+.rp-conf-level.neutral      { color: #b45309; }
+.rp-conf-level.unsatisfied  { color: #b91c1c; }
+.rp-conf-level.high-conf    { color: #15803d; }
+.rp-conf-level.medium-conf  { color: #b45309; }
+.rp-conf-level.low-conf     { color: #b91c1c; }
 
 /* Did you know */
 .rp-dyk {
