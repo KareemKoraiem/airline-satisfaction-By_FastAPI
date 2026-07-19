@@ -48,7 +48,7 @@
       <a href="#" class="nav-item" id="historyBtn">
         <i class="fas fa-clock-rotate-left"></i><span>History</span>
       </a>
-      <a href="#about-section" class="nav-item">
+      <a href="#about-section" class="nav-item" onclick="closeSidebarAndScroll('about-section'); return false;">
         <i class="fas fa-circle-info"></i><span>About Project</span>
       </a>
     </nav>
@@ -355,6 +355,16 @@
     overlay.classList.toggle('visible', isOpen);
     icon.className = isOpen ? 'fas fa-times' : 'fas fa-bars';
   }
+
+  function closeSidebarAndScroll(targetId) {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar.classList.contains('open')) toggleSidebar();
+    setTimeout(() => {
+      const el = document.getElementById(targetId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById('predictionForm').reset();

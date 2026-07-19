@@ -1,3 +1,4 @@
+6
 
 const API_BASE_URL = "https://airline-satisfaction-byfastapi-production.up.railway.app";
 
@@ -259,6 +260,13 @@ function showResult({ confidence, status, desc }) {
   card.style.animation = 'none';
   void card.offsetHeight;
   card.style.animation = 'fadeUp 0.45s ease both';
+
+  // On mobile (stacked layout), scroll result panel into view
+  if (window.innerWidth <= 1050) {
+    setTimeout(() => {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
 }
 
 /* ═══════════════════════════════════════════
@@ -282,4 +290,11 @@ function showError(message) {
   }
   document.getElementById('rpErrorMsg').textContent = message;
   errCard.style.display = 'flex';
+
+  // On mobile, scroll error card into view
+  if (window.innerWidth <= 1050) {
+    setTimeout(() => {
+      errCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
 }
