@@ -10,9 +10,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allow the frontend (served from a different origin/port, e.g. a static
-# file server or file:// during development) to call this API directly.
-# In production, replace "*" with the exact origin(s) of your frontend.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -94,14 +91,14 @@ def predict(passenger: Passenger):
         df = scaler.transform(df)
 
         prediction = model.predict(df)[0]
+        prediction_idx = int(prediction) 
 
-        result = "Satisfied" if prediction == 1 else "Neutral or Dissatisfied"
-
+        result = "Satisfied" if prediction_idx == 1 else "Neutral or Dissatisfied"
 
         confidence = None
         if hasattr(model, "predict_proba"):
             proba = model.predict_proba(df)[0]
-            confidence = round(float(max(proba)) * 100, 2)
+            confidence = round(float(proba[prediction_idx]) * 100, 2)
 
 
         return {
