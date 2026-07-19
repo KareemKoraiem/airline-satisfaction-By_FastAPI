@@ -72,6 +72,10 @@ function hoverStars(wrap, v) {
 let predHistory = [];
 
 function addHistory(entry) {
+  // Don't add if identical to the last prediction (same status + confidence)
+  const last = predHistory[0];
+  if (last && last.status === entry.status && last.confidence === entry.confidence) return;
+
   predHistory.unshift(entry);
   const body = document.getElementById('historyBody');
   if (!body) return;
