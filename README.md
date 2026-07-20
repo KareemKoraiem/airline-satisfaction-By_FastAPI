@@ -64,65 +64,6 @@ Several models were trained and compared before picking the final one, including
 | Recall | 0.941 |
 | F1 Score | 0.954 |
 
-## Example request
-
-```json
-POST /predict
-
-{
-  "Gender": "Female",
-  "Customer_Type": "Loyal Customer",
-  "Age": 34,
-  "Type_of_Travel": "Business travel",
-  "Class": "Business",
-  "Flight_Distance": 1200,
-  "Inflight_wifi_service": 4,
-  "Departure_Arrival_time_convenient": 3,
-  "Ease_of_Online_booking": 4,
-  "Gate_location": 3,
-  "Food_and_drink": 4,
-  "Online_boarding": 5,
-  "Seat_comfort": 4,
-  "Inflight_entertainment": 4,
-  "Onboard_service": 5,
-  "Leg_room_service": 4,
-  "Baggage_handling": 5,
-  "Checkin_service": 4,
-  "Inflight_service": 5,
-  "Cleanliness": 4,
-  "Arrival_Delay_in_Minutes": 10
-}
-```
-
-**Response:**
-```json
-{
-  "prediction": "satisfied"
-}
-```
-
-## Run locally (optional)
-
-The project is already live, so this is only needed if you want to run or modify the code yourself.
-
-1. Clone the repo
-   ```bash
-   git clone https://github.com/<your-username>/<your-repo>.git
-   cd <your-repo>
-   ```
-
-2. Install the dependencies
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Run the API
-   ```bash
-   uvicorn main:app --reload
-   ```
-
-4. Open `http://127.0.0.1:8000/docs` to test it out.
-
 ## Dataset
 
 Trained on the [Airline Passenger Satisfaction dataset](https://www.kaggle.com/datasets/teejmahal20/airline-passenger-satisfaction) from Kaggle.
